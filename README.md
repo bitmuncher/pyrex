@@ -1,2 +1,1 @@
-# pyrex
-PyRex - Remote Execution with Python
+Remote Execution with Python
