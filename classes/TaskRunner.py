@@ -43,12 +43,21 @@ class TaskRunner:
             arg_parts = arg.split('=')
             arg_list[arg_parts[0]] = arg_parts[1]
         for line in iter(f):
-            logging.debug(line)
+            logging.debug('...')
+            # skip empty lines
+            if line == '\n':
+                logging.debug('Empty line... going to next line')
+                continue
+
+            logging.debug('Line: ' + line.rstrip())
             lineparts = line.split()
+
+            # # - comments
             if lineparts[0] == '#':
-                # found a comment, go to next line
                 logging.debug("Comment... going to next line")
                 continue
+
+            # upload - file uploads
             elif lineparts[0] == 'upload':
                 fromfile = ''
                 tofile = ''
@@ -69,6 +78,18 @@ class TaskRunner:
                     tofile = lineparts[2]
                 logging.debug('Uploading file ' + fromfile + ' to target ' + tofile)
 
+            # remoterun - run a command on the remote host
+            elif lineparts[0] == 'remoterun':
+                # run a command on the specified host
+                cmd_str = ''
+                i = 0
+                for cmd_part in lineparts[1:]:
+                    if i > 0:
+                        cmd_str += ' ' + cmd_part
+                    else:
+                        cmd_str += cmd_part
+                logging.debug('Running command on host: ' + cmd_str)
+
         f.close()
         return True
 
@@ -78,7 +99,7 @@ class TaskRunner:
         """
         # check if task exists
         if not self.check_task(task, config):
-            print "Couldn't find a template for the specified task"
+            logging.error("Couldn't find a template for the specified task")
             sys.exit(0)
         # get the commands we have to run
         retval = self.parse_task(host, task, args, config)
