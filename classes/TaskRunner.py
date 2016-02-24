@@ -149,6 +149,8 @@ class TaskRunner:
                 hosts = pcfg.get_hosts_by_hostgroup(config, hostgroup)
                 for host in hosts:
                     self.run_task_host(host, task, args, config)
+            else:
+                logging.error('Please specify either a host or a hostgroup')
 
     def run_cmd(self, config, cmd=None, host=None, hostgroup=None):
         """
