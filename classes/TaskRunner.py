@@ -2,7 +2,7 @@ import sys
 import os.path
 
 import logging
-logging.basicConfig(stream=sys.stderr, level=logging.ERROR)
+logging.basicConfig(stream=sys.stderr, level=logging.WARNING)
 
 from classes.PyrexHelper import PyrexHelper
 phelper = PyrexHelper()
@@ -113,6 +113,7 @@ class TaskRunner:
         """
         run a task on a specific host
         """
+        print '\n' + host + '\n'
         # check if task exists
         if not self.check_task(task, config):
             logging.error("Couldn't find a template for the specified task")
