@@ -13,7 +13,7 @@ def ConfigSectionMap(config, section):
     return config_dict
 
 
-def get_hosts_by_hostgroup(self, config, hostgroup):
+def get_hosts_by_hostgroup(config, hostgroup):
     hostgroups = ConfigSectionMap(config, 'HostGroups')
     hostlist = hostgroups[hostgroup].split(',')
     return hostlist
