@@ -3,7 +3,7 @@ from __future__ import print_function
 import paramiko
 import sys
 import logging
-logging.basicConfig(stream=sys.stderr, level=logging.INFO)
+logging.basicConfig(stream=sys.stderr, level=logging.WARNING)
 
 
 class PyrexSSH:
