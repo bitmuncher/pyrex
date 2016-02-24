@@ -1,6 +1,5 @@
 import sys
 import os.path
-import re
 
 import logging
 logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
@@ -17,26 +16,33 @@ import classes.PyrexConfig as pcfg
 
 class TaskRunner:
     def __init__(self):
+        # nothing to do here
         pass
 
     def check_task(self, task, config):
         """
         check if a task template is available
         """
+        # get the task file path
         config_section = pcfg.ConfigSectionMap(config, 'Config')
         taskdir = config_section['taskdir']
         taskfile = taskdir + '/' + task + '.task'
+        # check if the task exists
         if os.path.isfile(taskfile):
             return True
         else:
             return False
 
     def parse_task(self, host, task, args, config):
-        # get the task file content
+        # get the task file path
         config_section = pcfg.ConfigSectionMap(config, 'Config')
         taskdir = config_section['taskdir']
         taskfile = taskdir + '/' + task + '.task'
+
+        # open task file
         f = open(taskfile, 'r')
+
+        # get the list of -a parameters
         args_parts = args.split(',')
         arg_list = {}
         for arg in args_parts:
