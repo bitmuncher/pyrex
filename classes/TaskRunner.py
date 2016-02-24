@@ -2,13 +2,12 @@ import sys
 import os.path
 
 import logging
-logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
+logging.basicConfig(stream=sys.stderr, level=logging.ERROR)
 
 from classes.PyrexHelper import PyrexHelper
 phelper = PyrexHelper()
 
 from classes.PyrexSSH import PyrexSSH
-pssh = PyrexSSH()
 
 import classes.PyrexConfig as pcfg
 #import ConfigParser as cfgp
@@ -36,6 +35,7 @@ class TaskRunner:
     def parse_task(self, host, task, args, config):
         # get the task file path
         config_section = pcfg.ConfigSectionMap(config, 'Config')
+        server_data = pcfg.ConfigSectionMap(config, host)
         taskdir = config_section['taskdir']
         taskfile = taskdir + '/' + task + '.task'
 
@@ -76,13 +76,15 @@ class TaskRunner:
                 else:
                     fromfile = lineparts[1]
                 if lineparts[2].find('{') and lineparts[2].find('}'):
-                    # we have a tag, replace ist with the value from args
+                    # we have a tag, replace it with the value from args
                     for k in arg_list:
-                        if lineparts[2].find('{' + arg_list[k] + '}'):
+                        if lineparts[2].find('{' + k + '}'):
                             tofile = lineparts[2].replace('{' + k + '}', arg_list[k])
                 else:
                     tofile = lineparts[2]
                 logging.debug('Uploading file ' + fromfile + ' to target ' + tofile)
+                pssh = PyrexSSH(server_data)
+                pssh.upload_file(fromfile, tofile)
 
             # remoterun - run a command on the remote host
             elif lineparts[0] == 'remoterun':
@@ -94,7 +96,15 @@ class TaskRunner:
                         cmd_str += ' ' + cmd_part
                     else:
                         cmd_str += cmd_part
-                logging.debug('Running command on host: ' + cmd_str)
+                    i += 1
+                if cmd_str.find('{') and cmd_str.find('}'):
+                    # we have a tag replace it with the value from args
+                    for k in arg_list:
+                        if cmd_str.find('{' + k + '}'):
+                            cmd = cmd_str.replace('{' + k + '}', arg_list[k])
+                logging.debug('Running command on host: ' + cmd)
+                pssh = PyrexSSH(server_data)
+                pssh.run_cmd(cmd)
 
         f.close()
         return True
@@ -161,7 +171,9 @@ class TaskRunner:
             # first get the needed data from the config
             server_data = pcfg.ConfigSectionMap(config, host)
             # and now run the command on the host
-            pssh.run_cmd(server_data, cmd)
+            # pssh.run_cmd(server_data, cmd)
+            pssh = PyrexSSH(server_data)
+            pssh.run_cmd(cmd)
         else:
             # we have a hostgroup
             # first get all hosts for this hostgroup
@@ -175,4 +187,5 @@ class TaskRunner:
             for host in hostlist:
                 server_data = pcfg.ConfigSectionMap(config, host)
                 # run the command
-                pssh.run_cmd(server_data, cmd)
+                pssh = PyrexSSH(server_data)
+                pssh.run_cmd(cmd)
