@@ -1,2 +1,4 @@
-[Uploads]
-/home/kts/projects/pyrex/tasks/test.task%s: /home/bitmuncher/test.task%s, version
+# upload a file
+upload /home/kts/projects/pyrex/tasks/test.task-{version} /home/bitmuncher/test.task-{version}
+# run a command
+remoterun 'ls -lh /home/bitmuncher/test.task'
