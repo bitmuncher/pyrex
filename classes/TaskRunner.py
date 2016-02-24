@@ -1,8 +1,9 @@
 import sys
 import os.path
+import re
 
 import logging
-logging.basicConfig(stream=sys.stderr, level=logging.INFO)
+logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
 
 from classes.PyrexHelper import PyrexHelper
 phelper = PyrexHelper()
@@ -32,10 +33,44 @@ class TaskRunner:
 
     def parse_task(self, host, task, args, config):
         # get the task file content
-        #config_section = pcfg.ConfigSectionMap(config, 'Config')
-        #taskdir = config_section['taskdir']
-        #taskfile = taskdir + '/' + task + '.task'
-        pass
+        config_section = pcfg.ConfigSectionMap(config, 'Config')
+        taskdir = config_section['taskdir']
+        taskfile = taskdir + '/' + task + '.task'
+        f = open(taskfile, 'r')
+        args_parts = args.split(',')
+        arg_list = {}
+        for arg in args_parts:
+            arg_parts = arg.split('=')
+            arg_list[arg_parts[0]] = arg_parts[1]
+        for line in iter(f):
+            logging.debug(line)
+            lineparts = line.split()
+            if lineparts[0] == '#':
+                # found a comment, go to next line
+                logging.debug("Comment... going to next line")
+                continue
+            elif lineparts[0] == 'upload':
+                fromfile = ''
+                tofile = ''
+                # replace inline tags in filenames
+                if lineparts[1].find('{') and lineparts[1].find('}'):
+                    # we have a tag, replace it with the value from args
+                    for k in arg_list:
+                        if lineparts[1].find('{' + arg_list[k] + '}'):
+                            fromfile = lineparts[1].replace('{' + k + '}', arg_list[k])
+                else:
+                    fromfile = lineparts[1]
+                if lineparts[2].find('{') and lineparts[2].find('}'):
+                    # we have a tag, replace ist with the value from args
+                    for k in arg_list:
+                        if lineparts[2].find('{' + arg_list[k] + '}'):
+                            tofile = lineparts[2].replace('{' + k + '}', arg_list[k])
+                else:
+                    tofile = lineparts[2]
+                logging.debug('Uploading file ' + fromfile + ' to target ' + tofile)
+
+        f.close()
+        return True
 
     def run_task_host(self, host, task, args, config):
         """
@@ -46,8 +81,8 @@ class TaskRunner:
             print "Couldn't find a template for the specified task"
             sys.exit(0)
         # get the commands we have to run
-        cmdlist = self.parse_task(host, task, args, config)
-        if cmdlist is False:
+        retval = self.parse_task(host, task, args, config)
+        if retval is False:
             print "Something is wrong with the task defintion!"
             sys.exit(0)
 
