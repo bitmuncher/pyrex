@@ -1,5 +1,6 @@
 import sys
 import os.path
+import os
 
 import logging
 logging.basicConfig(stream=sys.stderr, level=logging.WARNING)
@@ -105,6 +106,24 @@ class TaskRunner:
                 logging.debug('Running command on host: ' + cmd)
                 pssh = PyrexSSH(server_data)
                 pssh.run_cmd(cmd)
+
+            elif lineparts[0] == 'localrun':
+                # run a command on localhost
+                cmd_str = ''
+                i = 0
+                for cmd_part in lineparts[1:]:
+                    if i > 0:
+                        cmd_str += ' ' + cmd_part
+                    else:
+                        cmd_str += cmd_part
+                    i += 1
+                if cmd_str.find('{') and cmd_str.find('}'):
+                    # we have a tag replace it with the value from args
+                    for k in arg_list:
+                        if cmd_str.find('{' + k + '}'):
+                            cmd = cmd_str.replace('{' + k + '}', arg_list[k])
+                logging.debug('Running local command: ' + cmd)
+                os.system(cmd)
 
         f.close()
         return True

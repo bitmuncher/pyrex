@@ -1,5 +1,8 @@
 # upload a file
 upload /home/kts/projects/pyrex/tasks/test.task-{version} /home/bitmuncher/test.task-{version}
 
-# run a command
+# run a command on remote host
 remoterun ls -lh /home/bitmuncher/test.task-{version}
+
+# run a command on localhost
+localrun ls -lh /home/kts/projects/pyrex/tasks/test.task-{version}
