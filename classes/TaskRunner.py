@@ -39,7 +39,10 @@ class TaskRunner:
             for k in arg_list:
                 if linepart.find('{' + k + '}'):
                     linepart = linepart.replace('{' + k + '}', arg_list[k])
-                    return linepart
+            # if we still have a tag, replace it with nothing
+            if linepart.find('{') and linepart.find('}'):
+                linepart = linepart.replace('{' + k + '}', '')
+            return linepart
         else:
             return linepart
 
