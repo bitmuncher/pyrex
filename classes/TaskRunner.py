@@ -33,6 +33,16 @@ class TaskRunner:
         else:
             return False
 
+    def replace_tag(self, linepart, arg_list):
+        if linepart.find('{') and linepart.find('}'):
+            # we have a tag, replace it
+            for k in arg_list:
+                if linepart.find('{' + k + '}'):
+                    linepart = linepart.replace('{' + k + '}', arg_list[k])
+                    return linepart
+        else:
+            return linepart
+
     def parse_task(self, host, task, args, config):
         # get the task file path
         config_section = pcfg.ConfigSectionMap(config, 'Config')
@@ -49,6 +59,7 @@ class TaskRunner:
         for arg in args_parts:
             arg_parts = arg.split('=')
             arg_list[arg_parts[0]] = arg_parts[1]
+
         for line in iter(f):
             logging.debug('...')
             # skip empty lines
@@ -66,26 +77,19 @@ class TaskRunner:
 
             # upload - file uploads
             elif lineparts[0] == 'upload':
-                fromfile = ''
-                tofile = ''
-                # replace inline tags in filenames
-                if lineparts[1].find('{') and lineparts[1].find('}'):
-                    # we have a tag, replace it with the value from args
-                    for k in arg_list:
-                        if lineparts[1].find('{' + arg_list[k] + '}'):
-                            fromfile = lineparts[1].replace('{' + k + '}', arg_list[k])
-                else:
-                    fromfile = lineparts[1]
-                if lineparts[2].find('{') and lineparts[2].find('}'):
-                    # we have a tag, replace it with the value from args
-                    for k in arg_list:
-                        if lineparts[2].find('{' + k + '}'):
-                            tofile = lineparts[2].replace('{' + k + '}', arg_list[k])
-                else:
-                    tofile = lineparts[2]
+                fromfile = self.replace_tag(lineparts[1], arg_list)
+                tofile = self.replace_tag(lineparts[2], arg_list)
                 logging.debug('Uploading file ' + fromfile + ' to target ' + tofile)
                 pssh = PyrexSSH(server_data)
                 pssh.upload_file(fromfile, tofile)
+
+            # download - file downloads
+            elif lineparts[0] == 'download':
+                source = self.replace_tag(lineparts[1], arg_list)
+                target = self.replace_tag(lineparts[2], arg_list)
+                logging.debug('Downloading file ' + source + ' to target ' + target)
+                pssh = PyrexSSH(server_data)
+                pssh.download_file(source, target)
 
             # remoterun - run a command on the remote host
             elif lineparts[0] == 'remoterun':
@@ -93,37 +97,29 @@ class TaskRunner:
                 cmd_str = ''
                 i = 0
                 for cmd_part in lineparts[1:]:
+                    cmd_part = self.replace_tag(cmd_part, arg_list)
                     if i > 0:
                         cmd_str += ' ' + cmd_part
                     else:
                         cmd_str += cmd_part
                     i += 1
-                if cmd_str.find('{') and cmd_str.find('}'):
-                    # we have a tag replace it with the value from args
-                    for k in arg_list:
-                        if cmd_str.find('{' + k + '}'):
-                            cmd = cmd_str.replace('{' + k + '}', arg_list[k])
-                logging.debug('Running command on host: ' + cmd)
+                logging.debug('Running command on host: ' + cmd_str)
                 pssh = PyrexSSH(server_data)
-                pssh.run_cmd(cmd)
+                pssh.run_cmd(cmd_str)
 
             # localrun - run a command on localhost
             elif lineparts[0] == 'localrun':
                 cmd_str = ''
                 i = 0
                 for cmd_part in lineparts[1:]:
+                    cmd_part = self.replace_tag(cmd_part, arg_list)
                     if i > 0:
                         cmd_str += ' ' + cmd_part
                     else:
                         cmd_str += cmd_part
                     i += 1
-                if cmd_str.find('{') and cmd_str.find('}'):
-                    # we have a tag replace it with the value from args
-                    for k in arg_list:
-                        if cmd_str.find('{' + k + '}'):
-                            cmd = cmd_str.replace('{' + k + '}', arg_list[k])
-                logging.debug('Running local command: ' + cmd)
-                os.system(cmd)
+                logging.debug('Running local command: ' + cmd_str)
+                os.system(cmd_str)
 
         f.close()
         return True
