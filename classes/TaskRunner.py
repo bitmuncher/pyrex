@@ -107,8 +107,8 @@ class TaskRunner:
                 pssh = PyrexSSH(server_data)
                 pssh.run_cmd(cmd)
 
+            # localrun - run a command on localhost
             elif lineparts[0] == 'localrun':
-                # run a command on localhost
                 cmd_str = ''
                 i = 0
                 for cmd_part in lineparts[1:]:
