@@ -27,11 +27,20 @@ class PyrexSSH:
 
     def upload_file(self, infile, outfile):
         print('Uploading file %s to %s' % (infile, self.servername + ':' + outfile))
-        # get host key if we know one
         logging.info('Establishing SSH connection to: %s on port %s', self.host, self.port)
         t = paramiko.Transport((self.host, self.port))
         t.start_client()
         t.auth_publickey(self.user, paramiko.RSAKey.from_private_key_file(self.keyfile))
         sftp = paramiko.SFTPClient.from_transport(t)
         sftp.put(infile, outfile)
+        t.close()
+
+    def download_file(self, source, target):
+        print('Downloading file %s to %s', (self.servername + ':' + source, target))
+        logging.info('Establishing SSH connection to: %s on port %s', self.host, self.port)
+        t = paramiko.Transport((self.host, self.port))
+        t.start_client()
+        t.auth_publickey(self.user, paramiko.RSAKey().from_private_key_file(self.keyfile))
+        sftp = paramiko.SFTPClient.from_transport(t)
+        sftp.get(source, target)
         t.close()
