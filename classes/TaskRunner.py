@@ -46,6 +46,7 @@ class TaskRunner:
                 start = linepart.find('{')
                 end = linepart.find('}')
                 if start != -1 and end != -1:
+                    print 'No argument for ' + linepart[start + 1:end] + '! Removing tag.'
                     linepart = linepart.replace('{' + linepart[start + 1:end] + '}', '')
             return linepart
         else:
