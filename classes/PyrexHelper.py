@@ -3,6 +3,9 @@ class PyrexHelper:
         pass
 
     def print_help(self):
+        """
+        print the helpf for pyrex
+        """
         print("pyrex.py <parameters>")
         print("  -t <task>\t\tthe task PyRex should run")
         print("  -h <host>\t\tthe host where the task should run")
