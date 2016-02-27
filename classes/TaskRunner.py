@@ -1,7 +1,6 @@
 import sys
 import os.path
 import os
-import re
 
 import logging
 logging.basicConfig(stream=sys.stderr, level=logging.WARNING)
