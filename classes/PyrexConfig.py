@@ -14,6 +14,9 @@ def ConfigSectionMap(config, section):
 
 
 def get_hosts_by_hostgroup(config, hostgroup):
+    """
+    get a list of all hosts from a hostgroup definition in config
+    """
     hostgroups = ConfigSectionMap(config, 'HostGroups')
     hostlist = hostgroups[hostgroup].split(',')
     return hostlist
