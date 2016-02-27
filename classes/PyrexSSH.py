@@ -8,6 +8,9 @@ logging.basicConfig(stream=sys.stderr, level=logging.WARNING)
 
 class PyrexSSH:
     def __init__(self, server):
+        """
+        class initialization
+        """
         self.host = server['host']
         self.port = server['port']
         self.keyfile = server['keyfile']
@@ -16,6 +19,9 @@ class PyrexSSH:
         self.servername = server['name']
 
     def run_cmd(self, cmd):
+        """
+        run a remote command
+        """
         logging.info("Running '%s' on %s" % (cmd, self.servername))
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -26,6 +32,9 @@ class PyrexSSH:
         ssh.close()
 
     def upload_file(self, infile, outfile):
+        """
+        upload a file via SSH
+        """
         print('Uploading file %s to %s' % (infile, self.servername + ':' + outfile))
         logging.info('Establishing SSH connection to: %s on port %s', self.host, self.port)
         t = paramiko.Transport((self.host, self.port))
@@ -36,6 +45,9 @@ class PyrexSSH:
         t.close()
 
     def download_file(self, source, target):
+        """
+        download a file via SSH
+        """
         print('Downloading file %s to %s', (self.servername + ':' + source, target))
         logging.info('Establishing SSH connection to: %s on port %s', self.host, self.port)
         t = paramiko.Transport((self.host, self.port))
