@@ -42,17 +42,14 @@ class TaskRunner:
             for k in arg_list:
                 if linepart.find('{' + k + '}'):
                     linepart = linepart.replace('{' + k + '}', arg_list[k])
-            # if we still have a tag, replace it with nothing
-            if linepart.find('{') and linepart.find('}'):
-                print 'We still have a tag'
-                start = linepart.find('{')
-                end = linepart.find('}')
-                if start != -1 and end != -1:
-                    print 'No argument for ' + linepart[start + 1:end] + '! Removing tag.'
-                    linepart = linepart.replace('{' + linepart[start + 1:end] + '}', '')
-            return linepart
-        else:
-            return linepart
+        # if we still have a tag, replace it with nothing
+        if linepart.find('{') and linepart.find('}'):
+            start = linepart.find('{')
+            end = linepart.find('}')
+            if start != -1 and end != -1:
+                print 'No argument for ' + linepart[start + 1:end] + '! Removing tag.'
+                linepart = linepart.replace('{' + linepart[start + 1:end] + '}', '')
+        return linepart
 
     def parse_task(self, host, task, args, config):
         """
