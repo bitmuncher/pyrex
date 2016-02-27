@@ -1,6 +1,7 @@
 import sys
 import os.path
 import os
+import re
 
 import logging
 logging.basicConfig(stream=sys.stderr, level=logging.WARNING)
@@ -41,7 +42,11 @@ class TaskRunner:
                     linepart = linepart.replace('{' + k + '}', arg_list[k])
             # if we still have a tag, replace it with nothing
             if linepart.find('{') and linepart.find('}'):
-                linepart = linepart.replace('{' + k + '}', '')
+                print 'We still have a tag'
+                start = linepart.find('{')
+                end = linepart.find('}')
+                if start != -1 and end != -1:
+                    linepart = linepart.replace('{' + linepart[start + 1:end] + '}', '')
             return linepart
         else:
             return linepart
@@ -57,11 +62,12 @@ class TaskRunner:
         f = open(taskfile, 'r')
 
         # get the list of -a parameters
-        args_parts = args.split(',')
-        arg_list = {}
-        for arg in args_parts:
-            arg_parts = arg.split('=')
-            arg_list[arg_parts[0]] = arg_parts[1]
+        arg_list = {'tag': 'replacement'}
+        if args and args is not '':
+            args_parts = args.split(',')
+            for arg in args_parts:
+                arg_parts = arg.split('=')
+                arg_list[arg_parts[0]] = arg_parts[1]
 
         for line in iter(f):
             logging.debug('...')
