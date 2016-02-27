@@ -11,12 +11,16 @@ class PyrexSSH:
         """
         class initialization
         """
-        self.host = server['host']
-        self.port = server['port']
-        self.keyfile = server['keyfile']
-        self.user = server['username']
-        self.port = int(server['port'])
         self.servername = server['name']
+        print('Name: ' + self.servername)
+        self.host = server['host']
+        print('Host: ' + self.host)
+        self.port = int(server['port'])
+        print('Port: ' + str(self.port))
+        self.keyfile = server['keyfile']
+        print('Key: ' + self.keyfile)
+        self.user = server['username']
+        print('User: ' + self.user)
 
     def run_cmd(self, cmd):
         """
@@ -48,11 +52,11 @@ class PyrexSSH:
         """
         download a file via SSH
         """
-        print('Downloading file %s to %s', (self.servername + ':' + source, target))
+        print('Downloading file %s to %s' % (self.servername + ':' + source, target))
         logging.info('Establishing SSH connection to: %s on port %s', self.host, self.port)
         t = paramiko.Transport((self.host, self.port))
         t.start_client()
-        t.auth_publickey(self.user, paramiko.RSAKey().from_private_key_file(self.keyfile))
+        t.auth_publickey(self.user, paramiko.RSAKey.from_private_key_file(self.keyfile))
         sftp = paramiko.SFTPClient.from_transport(t)
         sftp.get(source, target)
         t.close()
