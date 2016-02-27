@@ -34,6 +34,9 @@ class TaskRunner:
             return False
 
     def replace_tag(self, linepart, arg_list):
+        """
+        replace tags in a string by given arguments
+        """
         if linepart.find('{') and linepart.find('}'):
             # we have a tag, replace it
             for k in arg_list:
@@ -52,6 +55,9 @@ class TaskRunner:
             return linepart
 
     def parse_task(self, host, task, args, config):
+        """
+        parse a task file
+        """
         # get the task file path
         config_section = pcfg.ConfigSectionMap(config, 'Config')
         server_data = pcfg.ConfigSectionMap(config, host)
