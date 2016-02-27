@@ -1,8 +1,12 @@
 # upload a file
 upload /home/kts/projects/pyrex/tasks/test.task-{version} /home/bitmuncher/test.task-{version}
 
+# download a file
+download /home/bitmuncher/generate-netfilter-u32-dns-rule.py /home/kts/generate-netfilter-u32-dns-rule.py-{version}
+
 # run a command on remote host
 remoterun ls -lh /home/bitmuncher/test.task-{version}
 
 # run a command on localhost
 localrun ls -lh /home/kts/projects/pyrex/tasks/test.task-{version}
+
