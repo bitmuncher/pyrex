@@ -15,6 +15,17 @@ import classes.PyrexConfig as pcfg
 
 
 class TaskRunner:
+    """
+    This class executes a task.
+    Execution order:
+        run_task()
+            run_cmd() if task name is 'runcmd'
+        check_task()
+        run_task_host()
+        parse_task()
+            replace_tag()
+    """
+
     def __init__(self):
         # nothing to do here
         pass
@@ -50,6 +61,21 @@ class TaskRunner:
                 print 'No argument for tag \'' + linepart[start + 1:end] + '\'! Removing tag.'
                 linepart = linepart.replace('{' + linepart[start + 1:end] + '}', '')
         return linepart
+
+    def run_task_host(self, host, task, args, config):
+        """
+        run a task on a specific host
+        """
+        print '\n' + host + '\n'
+        # check if task exists
+        if not self.check_task(task, config):
+            logging.error("Couldn't find a template for the specified task")
+            sys.exit(0)
+        # get the commands we have to run
+        retval = self.parse_task(host, task, args, config)
+        if retval is False:
+            print "Something is wrong with the task defintion!"
+            sys.exit(0)
 
     def parse_task(self, host, task, args, config):
         """
@@ -135,21 +161,6 @@ class TaskRunner:
 
         f.close()
         return True
-
-    def run_task_host(self, host, task, args, config):
-        """
-        run a task on a specific host
-        """
-        print '\n' + host + '\n'
-        # check if task exists
-        if not self.check_task(task, config):
-            logging.error("Couldn't find a template for the specified task")
-            sys.exit(0)
-        # get the commands we have to run
-        retval = self.parse_task(host, task, args, config)
-        if retval is False:
-            print "Something is wrong with the task defintion!"
-            sys.exit(0)
 
     def run_task(self, config, task=None, host=None, hostgroup=None, args=None):
         """
