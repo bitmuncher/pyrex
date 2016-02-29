@@ -19,6 +19,9 @@ You can run multiple commands at once if you use task files
 .task extension. For example: If you have a task file with name 'foobar.task' the
 task name is 'foobar'.
 
+There is a special case for task 'runcmd'. This task runs without a template and
+executes the command given with '-a'. 
+
 You can specify hosts and hostgroups in config.ini.
 
 Syntax of config.ini:
