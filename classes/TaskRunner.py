@@ -53,13 +53,15 @@ class TaskRunner:
             for k in arg_list:
                 if linepart.find('{' + k + '}'):
                     linepart = linepart.replace('{' + k + '}', arg_list[k])
-        # if we still have a tag, replace it with nothing
+        # if we still have a tag, ask for the value
         if linepart.find('{') and linepart.find('}'):
             start = linepart.find('{')
             end = linepart.find('}')
             if start != -1 and end != -1:
-                print 'No argument for tag \'' + linepart[start + 1:end] + '\'! Removing tag.'
-                linepart = linepart.replace('{' + linepart[start + 1:end] + '}', '')
+                print 'No argument for tag \'' + linepart[start + 1:end] + '\'!'
+                val = raw_input('Please enter a value for \'' + linepart[start + 1:end] + '\': ')
+                arg_list[linepart[start + 1:end]] = val
+                linepart = linepart.replace('{' + linepart[start + 1:end] + '}', val)
         return linepart
 
     def run_task_host(self, host, task, args, config):
@@ -210,7 +212,6 @@ class TaskRunner:
             # first get the needed data from the config
             server_data = pcfg.ConfigSectionMap(config, host)
             # and now run the command on the host
-            # pssh.run_cmd(server_data, cmd)
             pssh = PyrexSSH(server_data)
             pssh.run_cmd(cmd)
         else:
