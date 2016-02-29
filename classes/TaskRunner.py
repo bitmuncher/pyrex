@@ -55,12 +55,16 @@ class TaskRunner:
                     linepart = linepart.replace('{' + k + '}', arg_list[k])
         # if we still have a tag, ask for the value
         if linepart.find('{') and linepart.find('}'):
+            # extract the tag name
             start = linepart.find('{')
             end = linepart.find('}')
             if start != -1 and end != -1:
+                # ask for the value for this tag
                 print 'No argument for tag \'' + linepart[start + 1:end] + '\'!'
                 val = raw_input('Please enter a value for \'' + linepart[start + 1:end] + '\': ')
+                # add the value to arg_list
                 arg_list[linepart[start + 1:end]] = val
+                # replace the tag in the current line
                 linepart = linepart.replace('{' + linepart[start + 1:end] + '}', val)
         return linepart
 
