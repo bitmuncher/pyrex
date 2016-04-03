@@ -1,6 +1,6 @@
 #!/usr/bin/python2
 
-# we use the python 3 print function
+# we use the python 3 print function here
 from __future__ import print_function
 
 import sys
