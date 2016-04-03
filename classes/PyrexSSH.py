@@ -7,6 +7,9 @@ logging.basicConfig(stream=sys.stderr, level=logging.ERROR)
 
 
 class PyrexSSH:
+    """
+    SSH functions for PyREX
+    """
     def __init__(self, server):
         """
         class initialization
