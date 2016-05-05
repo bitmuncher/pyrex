@@ -14,6 +14,7 @@ class PyrexSSH:
         """
         class initialization
         """
+        print('####################')
         self.servername = server['name']
         print('Name: ' + self.servername)
         self.host = server['host']
